@@ -10,6 +10,6 @@ Represents a data structure that combines the characteristics of a priority queu
 using PriorityMap;
 ```
 
-If you want to modify/look at the source code for `PriorityMap`, just drag the `PriorityMap.cs` file from the folder into your project window, and copy & paste the code into your own project.
+- If you want to modify/look at the source code for `PriorityMap`, just drag the `PriorityMap.cs` file from the folder into your project window, and copy & paste the code into your own project.
 
 You're all done!!
