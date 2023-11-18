@@ -1,16 +1,3 @@
-# PriorityMap
-Represents a data structure that combines the characteristics of a priority queue and a key-value map.  Elements are associated with priorities, allowing efficient retrieval, update, and removal based on priority.
+# PriorityMapGeneral
 
-## INSTRUCTIONS:
-### 1. Download and extract *PriorityMap.dll* and *Newtonsoft.Json.dll*
-### 2. Open visual studio and create a new C# project
-### 3. Right click on *dependencies* -> *add project refrence* and select *PriorityMap.dll* and *Newtonsoft.Json.dll*
-### 4. Add these lines to your code: 
-```csharp
-using PriorityMap;
-using Newtonsoft.Json;
-```
-
-- If you want to modify/look at the source code for `PriorityMap`, just drag the `PriorityMap.cs` file from the folder into your project window, and copy & paste the code into your own project.
-
-You're all done!!
+### This is an implementation for PriorityMap using IEnumerable<T> instead of List<T>. This implementation is very sloppy, and pretty much purely experimental. If you want this to be better, just hit me up or something i'll change it
