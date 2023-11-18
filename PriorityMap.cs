@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace PriorityMap
+namespace PriorityMapGeneral
 {
     /// <summary>
     /// Represents a data structure that combines the characteristics of a priority queue and a key-value map.
@@ -12,7 +12,7 @@ namespace PriorityMap
         /// <summary>
         /// A sorted dictionary of data structures. The key represents the priority of the date structure. Higher number -> higher priority.
         /// </summary>
-        private SortedDictionary<int, List<T>> _priorityMap;
+        private SortedDictionary<int, IEnumerable<T>> _priorityMap;
 
         /// <summary>
         /// A lock object used for synchronization to ensure thread safety in critical sections.
@@ -30,7 +30,7 @@ namespace PriorityMap
 
                 foreach (var kvp in _priorityMap)
                 {
-                    totalCount += kvp.Value.Count;
+                    totalCount += kvp.Value.Count();
                 }
 
                 return totalCount;
@@ -46,7 +46,7 @@ namespace PriorityMap
         /// </param>
         public PriorityMap(IComparer<int>? priorityComparer = null)
         {
-            _priorityMap = new SortedDictionary<int, List<T>>(priorityComparer);
+            _priorityMap = new SortedDictionary<int, IEnumerable<T>>(priorityComparer);
         }
 
         /// <summary>
@@ -78,9 +78,9 @@ namespace PriorityMap
                 }
 
                 // Retrieve element
-                if (_priorityMap.TryGetValue(priority, out var priorityList) && index < priorityList.Count)
+                if (_priorityMap.TryGetValue(priority, out var priorityList) && index < priorityList.Count())
                 {
-                    return priorityList[index];
+                    return priorityList.ElementAt(index);
                 }
 
                 // We shouldn't be here even
@@ -103,7 +103,11 @@ namespace PriorityMap
                     _priorityMap[priority] = list;
                 }
 
-                list.Add(element); // Add the element to the corresponding priority list
+                // Create a new IEnumerable<T> with the added element
+                var updatedEnumerable = list.Concat(new[] { element });
+
+                // Update the original collection with the modified IEnumerable<T>
+                _priorityMap[priority] = updatedEnumerable;
             }
         }
 
@@ -124,26 +128,6 @@ namespace PriorityMap
                     return true;
                 }
                 return false;
-            }
-        }
-
-        /// <summary>
-        /// Adds an element with the specified priority to the PriorityMap in a thread-safe manner.
-        /// </summary>
-        /// <param name="element">The element to add.</param>
-        /// <param name="priority">The priority associated with the element (lower values indicate higher priority).</param>
-        public void AddThreadSafe(T element, int priority)
-        {
-            lock (_lock)
-            {
-                // Add the element to the corresponding priority list
-                if (!_priorityMap.TryGetValue(priority, out var list))
-                {
-                    list = new List<T>();
-                    _priorityMap[priority] = list;
-                }
-
-                list.Add(element);
             }
         }
 
@@ -170,13 +154,13 @@ namespace PriorityMap
                 var highestPriorityList = _priorityMap[highestPriority];
 
                 // Get the first element from the list (FIFO within the same priority)
-                var element = highestPriorityList[0];
+                var element = highestPriorityList.ElementAt(0);
 
                 // Remove the element from the list
-                highestPriorityList.RemoveAt(0);
+                _ = highestPriorityList.ElementAt(0);
 
                 // Remove the priority entry if the list is empty
-                if (highestPriorityList.Count == 0)
+                if (!highestPriorityList.Any())
                 {
                     _priorityMap.Remove(highestPriority);
                 }
@@ -270,14 +254,23 @@ namespace PriorityMap
                 var currentPriority = GetPriority(element);
 
                 // Remove the element from its current priority
-                _priorityMap[currentPriority].Remove(element);
+                // Create a new IEnumerable<T> without the specified element
+                var updatedEnumerable = _priorityMap[currentPriority].Where(item => !EqualityComparer<T>.Default.Equals(item, element));
+
+                // Update the original collection with the modified IEnumerable<T>
+                _priorityMap[currentPriority] = updatedEnumerable;
 
                 // Add the element to the new priority
                 if (!_priorityMap.ContainsKey(newPriority))
                 {
-                    _priorityMap[newPriority] = new List<T>();
+                    _priorityMap[newPriority] = new List<T> { element };
                 }
-                _priorityMap[newPriority].Add(element);
+                else
+                {
+                    var newList = _priorityMap[newPriority].ToList();
+                    newList.Add(element);
+                    _priorityMap[newPriority] = newList;
+                }
             }
         }
 
@@ -305,14 +298,14 @@ namespace PriorityMap
                 var highestPriorityList = _priorityMap[highestPriority];
 
                 // Check if the highest-priority list is empty
-                if (highestPriorityList.Count == 0)
+                if (highestPriorityList.Any())
                 {
                     // Return an invalid result
                     return default(T);
                 }
 
                 // Retrieve and return the element with the highest priority
-                var highestPriorityElement = highestPriorityList[0];
+                var highestPriorityElement = highestPriorityList.ElementAt(0);
                 return highestPriorityElement;
             }
         }
@@ -326,7 +319,7 @@ namespace PriorityMap
         /// or if there is an issue retrieving the highest priority list.
         /// </returns>
         /// <exception cref="InvalidOperationException">Thrown if the PriorityMap is empty or if there is an issue retrieving the highest priority list.</exception>
-        public List<T> RemoveHighestPriorityList()
+        public IEnumerable<T> RemoveHighestPriorityList()
         {
             lock (_lock)
             {
@@ -360,7 +353,7 @@ namespace PriorityMap
         {
             lock (_lock)
             {
-                _priorityMap = new SortedDictionary<int, List<T>>();
+                _priorityMap = new SortedDictionary<int, IEnumerable<T>>();
             }
         }
 
@@ -398,7 +391,7 @@ namespace PriorityMap
         /// Converts the PriorityMap to an array of lists containing the elements.
         /// </summary>
         /// <returns>An array of lists containing the elements from the PriorityMap.</returns>
-        public List<T>[] ToListArray()
+        public IEnumerable<T>[] ToListArray()
         {
             lock (_lock)
             {
@@ -455,7 +448,11 @@ namespace PriorityMap
 
                 foreach (var kvp in _priorityMap)
                 {
-                    kvp.Value.RemoveAll(item => EqualityComparer<T>.Default.Equals(item, element));
+                    // Use LINQ to create a new IEnumerable<T> without the specified element
+                    var updatedEnumerable = kvp.Value.Where(item => !EqualityComparer<T>.Default.Equals(item, element));
+
+                    // Update the original collection with the modified IEnumerable<T>
+                    _priorityMap[kvp.Key] = updatedEnumerable;
                 }
                 return true;
             }
@@ -483,8 +480,8 @@ namespace PriorityMap
                 // Check if the specified priority exists in the map
                 if (_priorityMap.ContainsKey(priority))
                 {
-                    // List with the specified priority exists, clear it
-                    _priorityMap[priority].Clear();
+                    // Remove the key-value pair (priority and associated list)
+                    _priorityMap.Remove(priority);
                     return true;
                 }
                 else
@@ -549,6 +546,19 @@ namespace PriorityMap
             }
         }
 
+        private void ClearDatastruct(IEnumerable<T> structure)
+        {
+            if (structure is ICollection<T> collection)
+            {
+                // If it's a collection, create a new instance of the same type
+                collection.Clear();
+            }
+            else
+            {
+                structure = Activator.CreateInstance(structure.GetType()) as IEnumerable<T> ?? Enumerable.Empty<T>();
+            }
+        }
+
         /// <summary>
         /// Moves all elements from one priority to another in the PriorityMap.
         /// </summary>
@@ -558,17 +568,23 @@ namespace PriorityMap
         {
             lock (_lock)
             {
-                if (_priorityMap.TryGetValue(sourcePriority, out var sourceList))
+                if (_priorityMap.TryGetValue(sourcePriority, out var sourceEnumerable))
                 {
                     if (!_priorityMap.ContainsKey(destinationPriority))
                     {
-                        _priorityMap[destinationPriority] = new List<T>();
+                        _priorityMap[destinationPriority] = sourceEnumerable;
+                    }
+                    else
+                    {
+                        var destinationList = _priorityMap[destinationPriority].ToList();
+                        destinationList.AddRange(sourceEnumerable);
+                        _priorityMap[destinationPriority] = destinationList;
                     }
 
-                    _priorityMap[destinationPriority].AddRange(sourceList);
-                    sourceList.Clear();
+                    // Clear the source priority
+                    ClearDatastruct(sourceEnumerable);
 
-                    if (sourceList.Count == 0)
+                    if (!sourceEnumerable.Any())
                     {
                         _priorityMap.Remove(sourcePriority);
                     }
@@ -592,17 +608,23 @@ namespace PriorityMap
 
                 foreach (var priority in priorities)
                 {
-                    if (_priorityMap.TryGetValue(priority, out var sourceList))
+                    if (_priorityMap.TryGetValue(priority, out var sourceEnumerable))
                     {
                         if (!_priorityMap.ContainsKey(destinationPriority))
                         {
-                            _priorityMap[destinationPriority] = new List<T>();
+                            _priorityMap[destinationPriority] = sourceEnumerable.ToList();
+                        }
+                        else
+                        {
+                            var destinationList = _priorityMap[destinationPriority].ToList();
+                            destinationList.AddRange(sourceEnumerable);
+                            _priorityMap[destinationPriority] = destinationList;
                         }
 
-                        _priorityMap[destinationPriority].AddRange(sourceList);
-                        sourceList.Clear();
+                        // Clear the source priority
+                        ClearDatastruct(sourceEnumerable);
 
-                        if (sourceList.Count == 0)
+                        if (!sourceEnumerable.Any())
                         {
                             _priorityMap.Remove(priority);
                         }
@@ -658,7 +680,7 @@ namespace PriorityMap
         /// <param name="priorities">An array of priorities to merge.</param>
         /// <param name="destinationPriority">The priority to merge the elements into.</param>
         /// <param name="mergeFunction">A custom merge function that defines the logic for combining lists of elements.</param>
-        public void MergePrioritiesWithCustomLogic(int[] priorities, int destinationPriority, Func<List<T>, List<T>, List<T>> mergeFunction)
+        public void MergePrioritiesWithCustomLogic(int[] priorities, int destinationPriority, Func<IEnumerable<T>, IEnumerable<T>, IEnumerable<T>> mergeFunction)
         {
             // Merge priorities using custom logic
             foreach (var priority in priorities)
@@ -676,10 +698,10 @@ namespace PriorityMap
                     _priorityMap[destinationPriority] = mergeFunction(_priorityMap[destinationPriority], sourceList);
 
                     // Clear the source list as it has been merged
-                    sourceList.Clear();
+                    ClearDatastruct(sourceList);
 
                     // Remove the source priority if its list is empty
-                    if (sourceList.Count == 0)
+                    if (!sourceList.Any())
                     {
                         _priorityMap.Remove(priority);
                     }
