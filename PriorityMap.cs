@@ -128,26 +128,6 @@ namespace PriorityMap
         }
 
         /// <summary>
-        /// Adds an element with the specified priority to the PriorityMap in a thread-safe manner.
-        /// </summary>
-        /// <param name="element">The element to add.</param>
-        /// <param name="priority">The priority associated with the element (lower values indicate higher priority).</param>
-        public void AddThreadSafe(T element, int priority)
-        {
-            lock (_lock)
-            {
-                // Add the element to the corresponding priority list
-                if (!_priorityMap.TryGetValue(priority, out var list))
-                {
-                    list = new List<T>();
-                    _priorityMap[priority] = list;
-                }
-
-                list.Add(element);
-            }
-        }
-
-        /// <summary>
         /// Removes and returns the element with the highest priority from the PriorityMap.
         /// If multiple elements share the highest priority, the first one added will be removed.
         /// </summary>
