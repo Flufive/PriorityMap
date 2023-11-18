@@ -1,13 +1,15 @@
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace PriorityMapGeneral
+namespace PriorityMap
 {
     /// <summary>
     /// Represents a data structure that combines the characteristics of a priority queue and a key-value map.
     /// Elements are associated with priorities, allowing efficient retrieval, update, and removal based on priority.
     /// </summary>
     /// <typeparam name="T">The type of elements stored in the PriorityMap.</typeparam>
-    public class PriorityMap<T>
+    public class PriorityMapGeneral<T>
     {
         /// <summary>
         /// A sorted dictionary of data structures. The key represents the priority of the date structure. Higher number -> higher priority.
@@ -44,7 +46,7 @@ namespace PriorityMapGeneral
         /// An optional comparer to use when sorting priorities in the internal <see cref="SortedDictionary{TKey, TValue}"/>.
         /// If not specified (null), the default comparer for the key type <see cref="int"/> will be used.
         /// </param>
-        public PriorityMap(IComparer<int>? priorityComparer = null)
+        public PriorityMapGeneral(IComparer<int>? priorityComparer = null)
         {
             _priorityMap = new SortedDictionary<int, IEnumerable<T>>(priorityComparer);
         }
@@ -538,11 +540,11 @@ namespace PriorityMapGeneral
         /// </summary>
         /// <param name="json">The JSON string to deserialize into a PriorityMap.</param>
         /// <returns>A new instance of PriorityMap with data from the deserialized JSON string.</returns>
-        public PriorityMap<T>? Deserialize(string json)
+        public PriorityMapGeneral<T>? Deserialize(string json)
         {
             lock (_lock)
             {
-                return JsonConvert.DeserializeObject<PriorityMap<T>>(json);
+                return JsonConvert.DeserializeObject<PriorityMapGeneral<T>>(json);
             }
         }
 
@@ -646,7 +648,7 @@ namespace PriorityMapGeneral
         /// <exception cref="InvalidOperationException">
         /// Thrown when the data structure of integers is larger than the data structure of data structures.
         /// </exception>
-        public PriorityMap<T> MergeDataStructures(Dictionary<int, List<T>> dataStructures, List<int> priorities)
+        public PriorityMapGeneral<T> MergeDataStructures(Dictionary<int, List<T>> dataStructures, List<int> priorities)
         {
             lock (_lock)
             {
@@ -657,7 +659,7 @@ namespace PriorityMapGeneral
                 }
 
                 // Create a new PriorityMap to store the merged data structures
-                var mergedPriorityMap = new PriorityMap<T>();
+                var mergedPriorityMap = new PriorityMapGeneral<T>();
 
                 // Iterate over the priorities and data structures to merge them into the PriorityMap
                 for (int i = 0; i < priorities.Count; i++)
