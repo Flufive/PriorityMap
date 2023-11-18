@@ -500,9 +500,13 @@ namespace PriorityMap
         {
             lock (_lock)
             {
+                if (IsEmpty())
+                {
+                    return Enumerable.Empty<T>();
+                }
                 return _priorityMap.Values.SelectMany(list => list);
             }
-        }
+        }        
 
         /// <summary>
         /// Serializes the PriorityMap to a JSON string using the Newtonsoft.Json library.
