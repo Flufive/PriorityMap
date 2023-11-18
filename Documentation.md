@@ -11,7 +11,25 @@
 ### Returns: The total number of elements in the PriorityMap.
 ### Description: Gets the total number of elements in the PriorityMap.
 -----------------------------------------------------------------------------------------
+## *Lock* Property
+### Type: readonly object
+### Description: A lock object used for synchronization to ensure thread safety in critical sections.
+-----------------------------------------------------------------------------------------
+## *Constructor*
 
+**Signature:**
+```csharp
+public PriorityMap(IComparer<int>? priorityComparer = null)
+```
+
+### Parameters:
+- priorityComparer: An optional comparer to use when sorting priorities in the internal SortedDictionary. If not specified (null), the default comparer for integers will be used.
+
+### Returns: 
+A new instance of the PriorityMap class
+
+### Description: Initializes a new instance of the PriorityMap class.
+-----------------------------------------------------------------------------------------
 ## *Add* Method
 
 **Signature:**
@@ -25,6 +43,26 @@ public void Add(T element, int priority)
 ### Description: Adds an element with the specified priority to the PriorityMap.
   
 ### Exceptions: System.InvalidOperationException - Thrown when the specified element does not exist within the PriorityMap.
+-----------------------------------------------------------------------------------------
+## *GetElementAt* Method
+
+**Signature:**
+```csharp
+public T GetElementAt(int priority, int index)
+```
+
+### Parameters:
+- priority: The priority of the list containing the desired element.
+- index: The index of the element within the specified priority list.
+
+### Returns: 
+The element at the specified index within the priority list.
+
+### Exceptions:
+- System.InvalidOperationException: Thrown when the PriorityMap is empty or if there is an issue retrieving the specified element.
+- System.ArgumentOutOfRangeException: Thrown when the specified priority does not exist within the PriorityMap.
+
+### Description: Retrieves the element at the specified index within the list associated with the given priority in the PriorityMap.
 -----------------------------------------------------------------------------------------
 ## *AddList* Method
 
@@ -243,6 +281,46 @@ An IEnumerable<T> containing all elements with the specified priority.
 
 ### Description: Retrieves all elements with the specified priority from the PriorityMap.
 -----------------------------------------------------------------------------------------
+##  *GetAllElements* Method
+
+**Signature:**
+
+```csharp
+public IEnumerable<T> GetAllElements()
+```
+
+### Returns:
+An IEnumerable<T> containing all elements in the PriorityMap. If the PriorityMap is empty, returns an empty IEnumerable<T>.
+
+### Description: Retrieves all elements from the PriorityMap, combining them into a single sequence.
+-----------------------------------------------------------------------------------------
+## *Serialize* Method
+
+**Signature:**
+```csharp
+public string Serialize()
+```
+
+### Returns: 
+A JSON string representing the serialized PriorityMap.
+
+### Description: Serializes the PriorityMap to a JSON string using the Newtonsoft.Json library.
+-----------------------------------------------------------------------------------------
+## *Desesrialize* Method
+
+**Signature:**
+```csharp
+public PriorityMap<T>? Deserialize(string json)
+```
+
+### Parameters:
+- json: The JSON string to deserialize into a PriorityMap.
+
+### Returns: 
+A new instance of PriorityMap with data from the deserialized JSON string.
+
+### Description: Deserializes a JSON string into a PriorityMap using the Newtonsoft.Json library.
+-----------------------------------------------------------------------------------------
 ## *MovePriority* Method
 
 **Signature:**
@@ -275,12 +353,29 @@ public void MergePriorities(int[] priorities, int destinationPriority)
 ```csharp
 public PriorityMap<T> MergeDataStructures(Dictionary<int, List<T>> dataStructures, List<int> priorities)
 ```
+
 ### Parameters:
 - dataStructures: A data structure of data structures with values to be merged into the PriorityMap.
 - priorities: A data structure of integers representing the priorities for the lists in the PriorityMap.
+
 ### Returns:
 A new PriorityMap containing the merged data structures.
+
 ### Exceptions: System.InvalidOperationException - Thrown when the number of priorities is greater than the number of data structures.
 
 ### Description: Merges a data structure of data structures with values and a data structure of integers into a single PriorityMap. The integers represent the priorities, and the data structure represents the lists.
+-----------------------------------------------------------------------------------------
+## *MergePrioritiesWithCustomLogic* Method
+
+**Signature:**
+```csharp
+public void MergePrioritiesWithCustomLogic(int[] priorities, int destinationPriority, Func<List<T>, List<T>, List<T>> mergeFunction)
+```
+
+### Parameters:
+- priorities: An array of priorities to merge.
+- destinationPriority: The priority to merge the elements into.
+- mergeFunction: A custom merge function that defines the logic for combining lists of elements.
+
+### Description: Merges multiple priorities into a single priority in the PriorityMap using custom logic provided by the specified merge function.
 -----------------------------------------------------------------------------------------
