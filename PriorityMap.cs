@@ -500,10 +500,6 @@ namespace PriorityMap
         {
             lock (_lock)
             {
-                if (IsEmpty())
-                {
-                    return Enumerable.Empty<T>();
-                }
                 return _priorityMap.Values.SelectMany(list => list);
             }
         }        
