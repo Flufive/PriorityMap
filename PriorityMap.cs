@@ -38,6 +38,20 @@ namespace PriorityMap
         }
 
         /// <summary>
+        /// Gets a read-only collection of all elements in the priority map.
+        /// </summary>
+        public IReadOnlyCollection<T> AllElements
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    return _priorityMap.Values.SelectMany(list => list).ToList().AsReadOnly();
+                }
+            }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="PriorityMap{T}"/> class.
         /// </summary>
         /// <param name="priorityComparer">
@@ -413,6 +427,146 @@ namespace PriorityMap
                 return priorities;
             }
         }
+        /// <summary>
+        /// Checks if the priority map contains any duplicate elements.
+        /// </summary>
+        /// <returns>True if there are duplicates; otherwise, false.</returns>
+        public bool ContainsDuplicates()
+        {
+            lock (_lock)
+            {
+                var allElements = AllElements.ToList();
+                var distinctElements = new HashSet<T>(allElements, EqualityComparer<T>.Default);
+                return allElements.Count != distinctElements.Count;
+            }
+        }
+
+
+        /// <summary>
+        /// Retrieves the total count of unique elements in the priority map.
+        /// </summary>
+        /// <returns>The count of unique elements.</returns>
+        public int GetUniqueElementCount()
+        {
+            lock (_lock)
+            {
+                var allElements = AllElements.ToList();
+                var distinctElements = new HashSet<T>(allElements, EqualityComparer<T>.Default);
+                return distinctElements.Count;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the elements with the highest priority.
+        /// </summary>
+        /// <returns>A list of elements with the highest priority.</returns>
+        public List<T> GetElementsWithHighestPriority()
+        {
+            lock (_lock)
+            {
+                if (IsEmpty())
+                {
+                    throw new InvalidOperationException("PriorityMap is empty, can't retrieve elements with the highest priority.");
+                }
+
+                var highestPriority = _priorityMap.Keys.Last();
+                return _priorityMap[highestPriority].ToList();
+            }
+        }
+
+        /// <summary>
+        /// Splits the priority map into two maps based on a predicate.
+        /// </summary>
+        /// <param name="predicate">The predicate to determine which priority map the element should belong to.</param>
+        /// <returns>
+        /// A tuple containing two PriorityMap instances:
+        /// satisfying - PriorityMap with elements satisfying the predicate.
+        /// notSatisfying - PriorityMap with elements not satisfying the predicate.
+        /// </returns>
+        public (PriorityMap<T> satisfying, PriorityMap<T> notSatisfying) SplitByPredicate(Func<T, bool> predicate)
+        {
+            lock (_lock)
+            {
+                var satisfyingMap = new PriorityMap<T>();
+                var notSatisfyingMap = new PriorityMap<T>();
+
+                if (IsEmpty())
+                {
+                    return (satisfyingMap, notSatisfyingMap);
+                }
+
+                foreach (var kvp in _priorityMap)
+                {
+                    var satisfyingElements = kvp.Value.Where(predicate).ToList();
+                    var notSatisfyingElements = kvp.Value.Except(satisfyingElements, EqualityComparer<T>.Default).ToList();
+
+                    if (satisfyingElements.Count > 0)
+                        satisfyingMap.AddList(satisfyingElements, kvp.Key);
+
+                    if (notSatisfyingElements.Count > 0)
+                        notSatisfyingMap.AddList(notSatisfyingElements, kvp.Key);
+                }
+
+                return (satisfyingMap, notSatisfyingMap);
+            }
+        }
+
+        /// <summary>
+        /// Executes a specified action on each element in the priority map.
+        /// </summary>
+        /// <param name="action">The action to perform on each element.</param>
+        public void ForEachElement(Action<T> action)
+        {
+            lock (_lock)
+            {
+                foreach (var priorityList in _priorityMap.Values)
+                {
+                    foreach (var element in priorityList)
+                    {
+                        action(element);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns a dictionary with priorities as keys and the number of elements in each priority list.
+        /// </summary>
+        /// <returns>A dictionary with priorities and the corresponding count of elements.</returns>
+        public Dictionary<int, int> GetPriorityCounts()
+        {
+            lock (_lock)
+            {
+                return _priorityMap.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Count);
+            }
+        }
+
+        /// <summary>
+        /// Reverses the order of elements within each priority list.
+        /// </summary>
+        public void ReverseElementOrder()
+        {
+            lock (_lock)
+            {
+                foreach (var priorityList in _priorityMap.Values)
+                {
+                    priorityList.Reverse();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks if the priority map contains elements at the specified priority.
+        /// </summary>
+        /// <param name="priority">The priority to check.</param>
+        /// <returns>True if the priority map contains elements at the specified priority; otherwise, false.</returns>
+        public bool HasElementsAtPriority(int priority)
+        {
+            lock (_lock)
+            {
+                return DoesPriorityExist(priority) && _priorityMap[priority].Count > 0;
+            }
+        }
 
         /// <summary>
         /// Removes all occurrences of a specific element from the PriorityMap.
@@ -502,7 +656,7 @@ namespace PriorityMap
             {
                 return _priorityMap.Values.SelectMany(list => list);
             }
-        }        
+        }
 
         /// <summary>
         /// Serializes the PriorityMap to a JSON string using the Newtonsoft.Json library.
@@ -588,6 +742,183 @@ namespace PriorityMap
                         }
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Checks if a specified priority does not exist within the priority map.
+        /// </summary>
+        /// <param name="priority">The priority to check.</param>
+        /// <returns>True if the priority does not exist; otherwise, false.</returns>
+        public bool DoesPriorityExist(int priority)
+        {
+            lock (_lock)
+            {
+                if (IsEmpty())
+                {
+                    return false;
+                }
+                return _priorityMap.ContainsKey(priority);
+            }
+        }
+
+        /// <summary>
+        /// Removes an element at the specified priority and index.
+        /// </summary>
+        /// <param name="priority">The priority of the element to remove.</param>
+        /// <param name="index">The index of the element to remove within its priority list.</param>
+        /// <exception cref="InvalidOperationException">Thrown if the priority map is empty.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the specified priority does not exist within the priority map.</exception>
+        public void RemoveElementAt(int priority, int index)
+        {
+            lock (_lock)
+            {
+                // Check if the priority map is empty
+                if (IsEmpty())
+                {
+                    throw new InvalidOperationException("PriorityMap is empty, can't remove any elements");
+                }
+
+                // Check if the specified priority exists within the priority map
+                if (!DoesPriorityExist(priority))
+                {
+                    throw new ArgumentOutOfRangeException("Priority doesn't exist within PriorityMap");
+                }
+
+                // Retrieve the priority list and remove the element at the specified index
+                if (_priorityMap.TryGetValue(priority, out var priorityList) && index < priorityList.Count)
+                {
+                    priorityList.RemoveAt(index);
+
+                    // Remove the entire priority if the list is empty after removal
+                    if (priorityList.Count == 0)
+                    {
+                        _priorityMap.Remove(priority);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds or updates an element in the priority map with the specified priority.
+        /// </summary>
+        /// <param name="element">The element to add or update.</param>
+        /// <param name="priority">The priority of the element.</param>
+        public void AddOrUpdate(T element, int priority)
+        {
+            lock (_lock)
+            {
+                // Try to get the existing list for the specified priority
+                if (_priorityMap.TryGetValue(priority, out var list))
+                {
+                    // Update existing list
+                    if (!list.Contains(element))
+                    {
+                        list.Add(element);
+                    }
+                }
+                else
+                {
+                    // Add new priority list
+                    Add(element, priority);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds or updates a collection of elements in the priority map with the specified priority.
+        /// </summary>
+        /// <param name="elements">The collection of elements to add or update.</param>
+        /// <param name="priority">The priority of the elements.</param>
+        public void AddOrUpdateList(IEnumerable<T> elements, int priority)
+        {
+            lock (_lock)
+            {
+                // Try to get the existing list for the specified priority
+                if (_priorityMap.TryGetValue(priority, out var list))
+                {
+                    // Update existing list
+                    list.AddRange(elements.Where(element => !list.Contains(element)));
+                }
+                else
+                {
+                    // Add new priority list
+                    AddList(elements, priority);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Attempts to retrieve the list of elements for a specified priority in the priority map.
+        /// </summary>
+        /// <param name="priority">The priority of the elements to retrieve.</param>
+        /// <param name="priorityList">When this method returns, contains the list of elements for the specified priority, if the priority exists; otherwise, null.</param>
+        /// <returns>True if the priority exists; otherwise, false.</returns>
+        public bool TryGetPriorityList(int priority, out List<T>? priorityList)
+        {
+            lock (_lock)
+            {
+                // Check if the specified priority exists
+                if (!DoesPriorityExist(priority))
+                {
+                    priorityList = null;
+                    return false;
+                }
+
+                // Retrieve the priority list
+                return _priorityMap.TryGetValue(priority, out priorityList);
+            }
+        }
+
+        /// <summary>
+        /// Trims excess capacity from the lists of elements in the priority map.
+        /// </summary>
+        public void TrimExcess()
+        {
+            lock (_lock)
+            {
+                // Iterate through all priority lists and trim excess capacity
+                foreach (var priorityList in _priorityMap.Values)
+                {
+                    priorityList.TrimExcess();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks if the priority map contains elements at all specified priorities.
+        /// </summary>
+        /// <param name="priorities">The priorities to check.</param>
+        /// <returns>True if the priority map contains elements at all specified priorities; otherwise, false.</returns>
+        public bool HasElementsAtAllPriorities(params int[] priorities)
+        {
+            lock (_lock)
+            {
+                return priorities.All(DoesPriorityExist);
+            }
+        }
+
+        /// <summary>
+        /// Returns the minimum count of elements among all priority lists.
+        /// </summary>
+        /// <returns>The minimum count of elements among all priority lists.</returns>
+        public int GetMinElementsCount()
+        {
+            lock (_lock)
+            {
+                return _priorityMap.Values.Min(list => list.Count);
+            }
+        }
+
+        /// <summary>
+        /// Returns the maximum count of elements among all priority lists.
+        /// </summary>
+        /// <returns>The maximum count of elements among all priority lists.</returns>
+        public int GetMaxElementsCount()
+        {
+            lock (_lock)
+            {
+                return _priorityMap.Values.Max(list => list.Count);
             }
         }
 
