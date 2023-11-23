@@ -278,8 +278,7 @@ namespace PriorityMap
         /// <summary>
         /// Retrieves the element with the highest priority from the PriorityMap without removing it.
         /// </summary>
-        /// <param name="result">An instance of PriorityMapResult&lt;T&gt; containing the element with the highest priority
-        /// if the highest-priority list is not empty; otherwise, an invalid result.</param>
+        /// if the highest-priority list is not empty; otherwise, an invalid result.
         /// <returns>True if the highest-priority list is not empty; otherwise, false.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the PriorityMap is empty.</exception>
         public T? TryPeekHighestPriority()
@@ -403,7 +402,9 @@ namespace PriorityMap
         /// <summary>
         /// Retrieves all priorities from the PriorityMap.
         /// </summary>
-        /// <returns>An IEnumerable<int> containing all priorities in the PriorityMap.</returns>
+        /// <returns>
+        /// An IEnumerable<int> containing all priorities in the PriorityMap.
+        /// </returns>
         /// <exception cref="InvalidOperationException">Thrown when PriorityMap is empty</exception>
         public IEnumerable<int> GetAllPriorities()
         {
@@ -427,6 +428,7 @@ namespace PriorityMap
                 return priorities;
             }
         }
+
         /// <summary>
         /// Checks if the priority map contains any duplicate elements.
         /// </summary>
@@ -440,7 +442,6 @@ namespace PriorityMap
                 return allElements.Count != distinctElements.Count;
             }
         }
-
 
         /// <summary>
         /// Retrieves the total count of unique elements in the priority map.
@@ -782,7 +783,7 @@ namespace PriorityMap
                 // Check if the specified priority exists within the priority map
                 if (!DoesPriorityExist(priority))
                 {
-                    throw new ArgumentOutOfRangeException("Priority doesn't exist within PriorityMap");
+                    throw new ArgumentOutOfRangeException($"Priority {priority} doesn't exist within PriorityMap");
                 }
 
                 // Retrieve the priority list and remove the element at the specified index
