@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>PriorityMap</name>
+        <name>test</name>
     </assembly>
     <members>
         <member name="T:PriorityMap.PriorityMap`1">
@@ -24,6 +24,11 @@
         <member name="P:PriorityMap.PriorityMap`1.Count">
             <summary>
             Gets the total number of elements in the PriorityMap.
+            </summary>
+        </member>
+        <member name="P:PriorityMap.PriorityMap`1.AllElements">
+            <summary>
+            Gets a read-only collection of all elements in the priority map.
             </summary>
         </member>
         <member name="M:PriorityMap.PriorityMap`1.#ctor(System.Collections.Generic.IComparer{System.Int32})">
@@ -146,6 +151,59 @@
             <returns>An array of lists containing the elements from the PriorityMap.</returns>
         </member>
         <!-- Badly formed XML comment ignored for member "M:PriorityMap.PriorityMap`1.GetAllPriorities" -->
+        <member name="M:PriorityMap.PriorityMap`1.ContainsDuplicates">
+            <summary>
+            Checks if the priority map contains any duplicate elements.
+            </summary>
+            <returns>True if there are duplicates; otherwise, false.</returns>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.GetUniqueElementCount">
+            <summary>
+            Retrieves the total count of unique elements in the priority map.
+            </summary>
+            <returns>The count of unique elements.</returns>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.GetElementsWithHighestPriority">
+            <summary>
+            Retrieves the elements with the highest priority.
+            </summary>
+            <returns>A list of elements with the highest priority.</returns>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.SplitByPredicate(System.Func{`0,System.Boolean})">
+            <summary>
+            Splits the priority map into two maps based on a predicate.
+            </summary>
+            <param name="predicate">The predicate to determine which priority map the element should belong to.</param>
+            <returns>
+            A tuple containing two PriorityMap instances:
+            satisfying - PriorityMap with elements satisfying the predicate.
+            notSatisfying - PriorityMap with elements not satisfying the predicate.
+            </returns>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.ForEachElement(System.Action{`0})">
+            <summary>
+            Executes a specified action on each element in the priority map.
+            </summary>
+            <param name="action">The action to perform on each element.</param>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.GetPriorityCounts">
+            <summary>
+            Returns a dictionary with priorities as keys and the number of elements in each priority list.
+            </summary>
+            <returns>A dictionary with priorities and the corresponding count of elements.</returns>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.ReverseElementOrder">
+            <summary>
+            Reverses the order of elements within each priority list.
+            </summary>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.HasElementsAtPriority(System.Int32)">
+            <summary>
+            Checks if the priority map contains elements at the specified priority.
+            </summary>
+            <param name="priority">The priority to check.</param>
+            <returns>True if the priority map contains elements at the specified priority; otherwise, false.</returns>
+        </member>
         <member name="M:PriorityMap.PriorityMap`1.RemoveElement(`0)">
             <summary>
             Removes all occurrences of a specific element from the PriorityMap.
@@ -204,6 +262,68 @@
             </summary>
             <param name="priorities">An array of priorities to merge.</param>
             <param name="destinationPriority">The priority to merge the elements into.</param>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.DoesPriorityExist(System.Int32)">
+            <summary>
+            Checks if a specified priority does not exist within the priority map.
+            </summary>
+            <param name="priority">The priority to check.</param>
+            <returns>True if the priority does not exist; otherwise, false.</returns>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.RemoveElementAt(System.Int32,System.Int32)">
+            <summary>
+            Removes an element at the specified priority and index.
+            </summary>
+            <param name="priority">The priority of the element to remove.</param>
+            <param name="index">The index of the element to remove within its priority list.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown if the priority map is empty.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown if the specified priority does not exist within the priority map.</exception>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.AddOrUpdate(`0,System.Int32)">
+            <summary>
+            Adds or updates an element in the priority map with the specified priority.
+            </summary>
+            <param name="element">The element to add or update.</param>
+            <param name="priority">The priority of the element.</param>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.AddOrUpdateList(System.Collections.Generic.IEnumerable{`0},System.Int32)">
+            <summary>
+            Adds or updates a collection of elements in the priority map with the specified priority.
+            </summary>
+            <param name="elements">The collection of elements to add or update.</param>
+            <param name="priority">The priority of the elements.</param>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.TryGetPriorityList(System.Int32,System.Collections.Generic.List{`0}@)">
+            <summary>
+            Attempts to retrieve the list of elements for a specified priority in the priority map.
+            </summary>
+            <param name="priority">The priority of the elements to retrieve.</param>
+            <param name="priorityList">When this method returns, contains the list of elements for the specified priority, if the priority exists; otherwise, null.</param>
+            <returns>True if the priority exists; otherwise, false.</returns>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.TrimExcess">
+            <summary>
+            Trims excess capacity from the lists of elements in the priority map.
+            </summary>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.HasElementsAtAllPriorities(System.Int32[])">
+            <summary>
+            Checks if the priority map contains elements at all specified priorities.
+            </summary>
+            <param name="priorities">The priorities to check.</param>
+            <returns>True if the priority map contains elements at all specified priorities; otherwise, false.</returns>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.GetMinElementsCount">
+            <summary>
+            Returns the minimum count of elements among all priority lists.
+            </summary>
+            <returns>The minimum count of elements among all priority lists.</returns>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.GetMaxElementsCount">
+            <summary>
+            Returns the maximum count of elements among all priority lists.
+            </summary>
+            <returns>The maximum count of elements among all priority lists.</returns>
         </member>
         <member name="M:PriorityMap.PriorityMap`1.MergeDataStructures(System.Collections.Generic.Dictionary{System.Int32,System.Collections.Generic.List{`0}},System.Collections.Generic.List{System.Int32})">
             <summary>
