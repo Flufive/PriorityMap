@@ -11,9 +11,13 @@
 ### Returns: The total number of elements in the PriorityMap.
 ### Description: Gets the total number of elements in the PriorityMap.
 -----------------------------------------------------------------------------------------
-## *Lock* Property
+## *_lock* Property
 ### Type: readonly object
 ### Description: A lock object used for synchronization to ensure thread safety in critical sections.
+-----------------------------------------------------------------------------------------
+## *AllElements* Property
+### Type: IReadOnlyCollection<T>
+### Description: Gets a read-only collection of all elements in the priority map.
 -----------------------------------------------------------------------------------------
 ## *Constructor*
 
@@ -29,20 +33,6 @@ public PriorityMap(IComparer<int>? priorityComparer = null)
 A new instance of the PriorityMap class
 
 ### Description: Initializes a new instance of the PriorityMap class.
------------------------------------------------------------------------------------------
-## *Add* Method
-
-**Signature:**
-```csharp
-public void Add(T element, int priority)
-```
-### Parameters:
-- element: The element to add.
-- priority: The priority associated with the element (lower values indicate higher priority).
-
-### Description: Adds an element with the specified priority to the PriorityMap.
-  
-### Exceptions: System.InvalidOperationException - Thrown when the specified element does not exist within the PriorityMap.
 -----------------------------------------------------------------------------------------
 ## *GetElementAt* Method
 
@@ -63,6 +53,20 @@ The element at the specified index within the priority list.
 - System.ArgumentOutOfRangeException: Thrown when the specified priority does not exist within the PriorityMap.
 
 ### Description: Retrieves the element at the specified index within the list associated with the given priority in the PriorityMap.
+-----------------------------------------------------------------------------------------
+## *Add* Method
+
+**Signature:**
+```csharp
+public void Add(T element, int priority)
+```
+### Parameters:
+- element: The element to add.
+- priority: The priority associated with the element (lower values indicate higher priority).
+
+### Description: Adds an element with the specified priority to the PriorityMap.
+  
+### Exceptions: System.InvalidOperationException - Thrown when the specified element does not exist within the PriorityMap.
 -----------------------------------------------------------------------------------------
 ## *AddList* Method
 
@@ -236,6 +240,18 @@ An IEnumerable<int> containing all priorities in the PriorityMap.
 
 ### Description: Retrieves all priorities from the PriorityMap.
 -----------------------------------------------------------------------------------------
+## *ContainsDuplicates* Method
+
+**Signature:**
+```csharp
+public bool ContainsDuplicates()
+```
+
+### Returns: 
+True if there are duplicates; otherwise, false.
+
+### Description: Checks if the priority map contains any duplicate elements.
+-----------------------------------------------------------------------------------------
 ## *RemoveElement* Method
 
 **Signature:**
@@ -251,6 +267,47 @@ true if the operation is successful. false if the element is not found or the Pr
 
 ### Description: Removes all occurrences of a specific element from the PriorityMap.
 -----------------------------------------------------------------------------------------
+## *GetUniqueElementCount* Method
+
+**Signature:**
+```csharp
+public int GetUniqueElementCount()
+```
+
+### Returns:
+The count of unique elements.
+
+### Description: Retrieves the total count of unique elements in the priority map.
+-----------------------------------------------------------------------------------------
+## *GetElementsWithHighestPriority* Method
+
+**Signature:**
+```csharp
+public List<T> GetElementsWithHighestPriority()
+```
+
+### Returns:
+A list of elements with the highest priority.
+
+### Description: Retrieves the elements with the highest priority.
+-----------------------------------------------------------------------------------------
+## *SplitByPredicate* Method
+
+**Signature:**
+```csharp
+public (PriorityMap<T> satisfying, PriorityMap<T> notSatisfying) SplitByPredicate(Func<T, bool> predicate)
+```
+
+### Parameters: 
+- predicate: The predicate to determine which priority map the element should belong to.
+
+### Returns: 
+A tuple containing two PriorityMap instances:
+- satisfying: PriorityMap with elements satisfying the predicate.
+- notSatisfying: PriorityMap with elements not satisfying the predicate.
+
+### Description: Splits the priority map into two maps based on a predicate.
+-----------------------------------------------------------------------------------------
 ## *ClearPriority* Method
 
 **Signature:**
@@ -265,6 +322,18 @@ public bool ClearPriority(int priority)
 true if the list with the specified priority exists and is successfully cleared. false if the list with the specified priority does not exist or the PriorityMap is empty.\
 
 ### Description: Clears the list with the specified priority from the PriorityMap.
+-----------------------------------------------------------------------------------------
+## *ForEachElement* Method
+
+**Signature:**
+```csharp
+public void ForEachElement(Action<T> action)
+```
+
+### Parameters: 
+- action: The action to perform on each element.
+
+### Description: Executes a specified action on each element in the priority map.
 -----------------------------------------------------------------------------------------
 ## *GetElementsWithPriority* Method
 
