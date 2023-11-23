@@ -416,6 +416,133 @@ public void MergePriorities(int[] priorities, int destinationPriority)
 
 ### Description: Merges multiple priorities into a single priority in the PriorityMap.
 -----------------------------------------------------------------------------------------
+## *DoesPriorityExist* Method
+
+**Signature:**
+```csharp
+public bool DoesPriorityExist(int priority)
+```
+
+### Parameters:
+- priority: The priority to check.
+
+### Returns: True if the priority exists; otherwise, false.
+
+### Description: Checks if a specified priority does not exist within the priority map.
+-----------------------------------------------------------------------------------------
+## *RemoveElementAt* Method
+
+**Signature:**
+```csharp
+public void RemoveElementAt(int priority, int index)
+```
+
+### Parameters:
+- priority: The priority of element to remove.
+- index: The index of the element to remove within its priority list.
+
+### Exceptions: 
+- InvalidOperationException: Thrown if the priority map is empty.
+- ArgumentOutOfRangeException: Thrown if the specified priority does not exist within the priority map.
+
+### Description: Removes an element at the specified priority and index within the list in that priority.
+-----------------------------------------------------------------------------------------
+## *AddOrUpdate* Method
+
+**Signature:**
+```chsarp
+public void AddOrUpdate(T element, int priority)
+```
+
+### Parameters: 
+- element: The element to add or update.
+- priority: The priority of the element.
+
+### Description: Adds or updates an element in the priority map with the specified priority.
+-----------------------------------------------------------------------------------------
+## *AddOrUpdateList* Method
+
+**Signature:**
+```csharp
+public void AddOrUpdateList(IEnumerable<T> elements, int priority)
+```
+
+### Parameters: 
+- elements: The collection of elements to add or update.
+- priority: The priority of the elements.
+
+### Description: Adds or updates a collection of elements in the priority map with the specified priority.
+-----------------------------------------------------------------------------------------
+## **Remark**
+
+For the *AddOrUpdate* and *AddOrUpdateList* methods, i didn't throw exceptions for the cases where the map is empty
+or the priority does not exist in the priority map. That's because I used the TryGetValue() method to simply create whatever I'm missing, 
+just to make for slightly more graceful error handling in cases you will probably run into a lot using a priority queue.
+-----------------------------------------------------------------------------------------
+## *TryGetPriorityList* Method
+
+**Signature:**
+```csharp
+public bool TryGetPriorityList(int priority, out List<T>? priorityList)
+```
+
+### Parameters:
+- priority: The priority of the elements to retrieve.
+- priorityList: When this method returns, contains the list of elements for the specified priority, if the priority exists; otherwise, null.
+
+### Returns: 
+True if the priority exists; otherwise, false.
+
+### Description: Attempts to retrieve the list of elements for a specified priority in the priority map.
+-----------------------------------------------------------------------------------------
+## *TrimExcess* Method
+
+**Signature:**
+```csharp
+public void TrimExcess()
+```
+
+### Description: Trims excess capacity from the lists of elements in the priority map.
+-----------------------------------------------------------------------------------------
+## *HasElementsAtAllPriorities* Method
+
+**Signature:**
+```csharp
+public bool HasElementsAtAllPriorities(params int[] priorities)
+```
+
+### Parameters: 
+- priorities: The priorities to check.
+
+### Returns:
+True if the priority map contains elements at all specified priorities; otherwise, false.
+
+### Description: Checks if the priority map contains elements at all specified priorities.
+-----------------------------------------------------------------------------------------
+## *GetMinElementsCount* Method
+
+**Signature:**
+```csharp
+public int GetMinElementsCount()
+```
+
+### Returns:
+The minimum count of elements among all priority lists.
+
+### Description: The minimum count of elements among all priority lists.
+-----------------------------------------------------------------------------------------
+## *GetMaxElementsCount* Method
+
+**Signature:**
+```csharp
+public int GetMaxElementsCount()
+```
+
+### Returns:
+The maximum count of elements among all priority lists.
+
+### Description: Returns the maximum count of elements among all priority lists.
+-----------------------------------------------------------------------------------------
 ## *MergeDataStructures* Method
 
 **Signature:**
