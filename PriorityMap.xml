@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>test</name>
+        <name>PriorityMap</name>
     </assembly>
     <members>
         <member name="T:PriorityMap.PriorityMap`1">
