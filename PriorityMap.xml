@@ -112,8 +112,7 @@
             <summary>
             Retrieves the element with the highest priority from the PriorityMap without removing it.
             </summary>
-            <param name="result">An instance of PriorityMapResult&lt;T&gt; containing the element with the highest priority
-            if the highest-priority list is not empty; otherwise, an invalid result.</param>
+            if the highest-priority list is not empty; otherwise, an invalid result.
             <returns>True if the highest-priority list is not empty; otherwise, false.</returns>
             <exception cref="T:System.InvalidOperationException">Thrown when the PriorityMap is empty.</exception>
         </member>
