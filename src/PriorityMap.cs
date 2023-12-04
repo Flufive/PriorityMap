@@ -964,6 +964,7 @@ namespace PriorityMap
             }
         }
 
+
         /// <summary>
         /// Merges multiple priorities into a single priority in the PriorityMap using custom logic provided by the specified merge function.
         /// </summary>
@@ -986,9 +987,6 @@ namespace PriorityMap
 
                     // Apply the custom merge function to combine the source and destination lists
                     _priorityMap[destinationPriority] = mergeFunction(_priorityMap[destinationPriority], sourceList);
-
-                    // Clear the source list as it has been merged
-                    sourceList.Clear();
 
                     // Remove the source priority if its list is empty
                     if (sourceList.Count == 0)
