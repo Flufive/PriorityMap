@@ -68,6 +68,46 @@ public void Add(T element, int priority)
   
 ### Exceptions: System.InvalidOperationException - Thrown when the specified element does not exist within the PriorityMap.
 -----------------------------------------------------------------------------------------
+## *BulkAdd* Method
+
+**Signature:**
+```csharp
+public void BulkAdd(IDictionary<T, int> items)
+```
+
+### Parameters:
+- items: A dictionary where keys are items and values are their priorities.
+
+### Description: Adds multiple items with their corresponding priorities to the PriorityMap.
+-----------------------------------------------------------------------------------------
+## *Clone* Method
+
+**Signature:**
+```csharp
+public PriorityMap<T> Clone()
+```
+
+### Returns: 
+A new PriorityMap instance that is a deep copy of the original.
+
+### Description: Creates a deep copy of the PriorityMap.
+-----------------------------------------------------------------------------------------
+## *PriorityRange* Method
+
+**Signature:**
+```csharp
+public IEnumerable<T> PriorityRange(int minPriority, int maxPriority)
+```
+
+### Parameters:
+- minPriority: The minimum priority (inclusive).
+- maxPriority: The maximum priority (inclusive).
+
+### Returns:
+An IEnumerable containing items within the specified priority range.
+
+### Description: Retrieves items with priorities within the specified range.
+-----------------------------------------------------------------------------------------
 ## *AddList* Method
 
 **Signature:**
