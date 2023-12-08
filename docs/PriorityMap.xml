@@ -61,6 +61,29 @@
             <param name="element">The element to add.</param>
             <param name="priority">The priority associated with the element (lower values indicate higher priority).</param>
         </member>
+        <member name="M:PriorityMap.PriorityMap`1.BulkAdd(System.Collections.Generic.IDictionary{`0,System.Int32})">
+            <summary>
+            Adds multiple items with their corresponding priorities to the PriorityMap.
+            </summary>
+            <param name="items">A dictionary where keys are items and values are their priorities.</param>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.Clone">
+            <summary>
+            Creates a deep copy of the PriorityMap.
+            </summary>
+            <remarks>
+            The new PriorityMap has distinct instances of lists and items.
+            </remarks>
+            <returns>A new PriorityMap instance that is a deep copy of the original.</returns>
+        </member>
+        <member name="M:PriorityMap.PriorityMap`1.PriorityRange(System.Int32,System.Int32)">
+            <summary>
+            Retrieves items with priorities within the specified range.
+            </summary>
+            <param name="minPriority">The minimum priority (inclusive).</param>
+            <param name="maxPriority">The maximum priority (inclusive).</param>
+            <returns>An IEnumerable containing items within the specified priority range.</returns>
+        </member>
         <member name="M:PriorityMap.PriorityMap`1.AddList(System.Collections.Generic.IEnumerable{`0},System.Int32)">
             <summary>
             Adds a list to the PriorityMap with the specified priority.
@@ -149,7 +172,15 @@
             </summary>
             <returns>An array of lists containing the elements from the PriorityMap.</returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:PriorityMap.PriorityMap`1.GetAllPriorities" -->
+        <member name="M:PriorityMap.PriorityMap`1.GetAllPriorities">
+            <summary>
+            Retrieves all priorities from the PriorityMap.
+            </summary>
+            <returns>
+            An IEnumerable(int) containing all priorities in the PriorityMap.
+            </returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when PriorityMap is empty</exception>
+        </member>
         <member name="M:PriorityMap.PriorityMap`1.ContainsDuplicates">
             <summary>
             Checks if the priority map contains any duplicate elements.
