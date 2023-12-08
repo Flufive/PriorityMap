@@ -122,6 +122,53 @@ namespace PriorityMap
         }
 
         /// <summary>
+        /// Adds multiple items with their corresponding priorities to the PriorityMap.
+        /// </summary>
+        /// <param name="items">A dictionary where keys are items and values are their priorities.</param>
+        public void BulkAdd(IDictionary<T, int> items)
+        {
+            foreach (var kvp in items)
+            {
+                Add(kvp.Key, kvp.Value);
+            }
+        }
+    
+        /// <summary>
+        /// Creates a deep copy of the PriorityMap.
+        /// </summary>
+        /// <remarks>
+        /// The new PriorityMap has distinct instances of lists and items.
+        /// </remarks>
+        /// <returns>A new PriorityMap instance that is a deep copy of the original.</returns>
+        public PriorityMap<T> Clone()
+        {
+            var clone = new PriorityMap<T>();
+            
+            foreach (var kvp in priorityMap)
+            {
+                // Create a new list and add copies of the items
+                clone.priorityMap[kvp.Key] = new List<T>(kvp.Value.Select(item => item));
+            }
+        
+            return clone;
+        }
+
+    
+        /// <summary>
+        /// Retrieves items with priorities within the specified range.
+        /// </summary>
+        /// <param name="minPriority">The minimum priority (inclusive).</param>
+        /// <param name="maxPriority">The maximum priority (inclusive).</param>
+        /// <returns>An IEnumerable containing items within the specified priority range.</returns>
+        public IEnumerable<T> PriorityRange(int minPriority, int maxPriority)
+        {
+            var selectedItems = priorityMap
+                .Where(kvp => kvp.Key >= minPriority && kvp.Key <= maxPriority)
+                .SelectMany(kvp => kvp.Value);
+            return selectedItems;
+        }
+
+        /// <summary>
         /// Adds a list to the PriorityMap with the specified priority.
         /// If a list with the same priority already exists, returns false; otherwise, returns true.
         /// </summary>
